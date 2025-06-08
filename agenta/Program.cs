@@ -1,5 +1,7 @@
 ﻿using System.Text.RegularExpressions;
 using System.Threading;
+using System.IO.Pipes;
+using System.Text.Json;
 
 class Program
 {
@@ -31,6 +33,8 @@ class Program
             }
         }
 
+        SendDataToMaster("agent1pipe");
+
         Console.WriteLine("Done reading");
         Console.ReadKey();
     }
@@ -57,4 +61,27 @@ class Program
             indexedData[Path.GetFileName(file)] = wordCounts;
         }
     }
+
+
+    static void SendDataToMaster(string pipeName)
+    {
+        try
+        {
+            using NamedPipeClientStream pipeClient = new(".", pipeName, PipeDirection.Out);
+            Console.WriteLine("Master connectiong...");
+            pipeClient.Connect(); // master connection
+
+            string json = JsonSerializer.Serialize(indexedData);
+            using StreamWriter writer = new(pipeClient);
+            writer.AutoFlush = true;
+            writer.WriteLine(json);
+
+            Console.WriteLine("Data sent");
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Data couldnt send error: {ex.Message}");
+        }
+    }
+
 }
