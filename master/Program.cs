@@ -1,6 +1,9 @@
 ﻿using System.IO.Pipes;
 using System.Text.Json;
 using System.Collections.Concurrent;
+using System.Diagnostics;
+
+
 
 class Program
 {
@@ -8,6 +11,7 @@ class Program
 
     static void Main(string[] args)
     {
+        Process.GetCurrentProcess().ProcessorAffinity = (IntPtr)4; // processor affinity 
         Console.WriteLine("Master running searching for agents...");
 
         Thread agentAThread = new(() => ReceiveFromAgent("agent1pipe"));

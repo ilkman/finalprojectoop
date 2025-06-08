@@ -2,6 +2,9 @@
 using System.Threading;
 using System.IO.Pipes;
 using System.Text.Json;
+using System.Diagnostics;
+
+
 
 class Program
 {
@@ -9,6 +12,7 @@ class Program
 
     static void Main(string[] args)
     {
+        Process.GetCurrentProcess().ProcessorAffinity = (IntPtr)2; // processor affinity 
         Console.WriteLine("AgentB running");
         Console.Write("Please give the path for the txt files folder: ");
         string directoryPath = Console.ReadLine();
