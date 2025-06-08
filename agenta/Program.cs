@@ -24,14 +24,7 @@ class Program
         fileReaderThread.Start();
         fileReaderThread.Join(); // rem later
 
-        // test output remove later
-        foreach (var fileEntry in indexedData)
-        {
-            foreach (var wordEntry in fileEntry.Value)
-            {
-                Console.WriteLine($"{fileEntry.Key}:{wordEntry.Key}:{wordEntry.Value}");
-            }
-        }
+        
 
         SendDataToMaster("agent1pipe");
 
