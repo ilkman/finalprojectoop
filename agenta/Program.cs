@@ -1,7 +1,10 @@
 ﻿using System.Text.RegularExpressions;
+using System.Threading;
 
 class Program
 {
+    static Dictionary<string, Dictionary<string, int>> indexedData = new();
+
     static void Main(string[] args)
     {
         Console.WriteLine("AgentA running");
@@ -15,14 +18,31 @@ class Program
             return;
         }
 
-        var indexedData = new Dictionary<string, Dictionary<string, int>>();
+        Thread fileReaderThread = new(() => ReadAndIndexFiles(directoryPath));
+        fileReaderThread.Start();
+        fileReaderThread.Join(); // rem later
 
+        // test output remove later
+        foreach (var fileEntry in indexedData)
+        {
+            foreach (var wordEntry in fileEntry.Value)
+            {
+                Console.WriteLine($"{fileEntry.Key}:{wordEntry.Key}:{wordEntry.Value}");
+            }
+        }
+
+        Console.WriteLine("Done reading");
+        Console.ReadKey();
+    }
+
+    static void ReadAndIndexFiles(string directoryPath)
+    {
         string[] files = Directory.GetFiles(directoryPath, "*.txt");
+
         foreach (var file in files)
         {
             var wordCounts = new Dictionary<string, int>();
             string content = File.ReadAllText(file);
-
             // extract the words
             var words = Regex.Matches(content.ToLower(), @"\b\w+\b");
 
@@ -36,17 +56,5 @@ class Program
 
             indexedData[Path.GetFileName(file)] = wordCounts;
         }
-
-        // test output
-        foreach (var fileEntry in indexedData)
-        {
-            foreach (var wordEntry in fileEntry.Value)
-            {
-                Console.WriteLine($"{fileEntry.Key}:{wordEntry.Key}:{wordEntry.Value}");
-            }
-        }
-
-        Console.WriteLine("Press any key to close");
-        Console.ReadKey();
     }
 }
